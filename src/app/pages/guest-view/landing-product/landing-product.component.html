@@ -131,18 +131,18 @@
                                 <div class="tp-product-details-variation-list">
                                     @for(subvariation of variation_selected.subvariations;track subvariation.id){
                                         @if(subvariation.propertie && subvariation.propertie.code){
-                                            <button type="button" class="color tp-color-variation-btn mx-1" >
+                                            <button type="button" class="color tp-color-variation-btn mx-1" (click)="selectedSubVariation(subvariation)" >
                                             <span [attr.data-bg-color]="subvariation.propertie.code"></span>
                                             <span class="tp-color-variation-tootltip">{{ subvariation.propertie.name }}</span>
                                             </button>
                                         }
                                         @if(subvariation.propertie && !subvariation.propertie.code){
-                                            <button type="button" class=" tp-size-variation-btn" style="width: 80px !important;">
+                                            <button type="button" (click)="selectedSubVariation(subvariation)" class=" tp-size-variation-btn" style="width: 80px !important;">
                                             <span>{{subvariation.propertie.name  }}</span>
                                             </button>
                                         }
                                         @if(!subvariation.propertie){
-                                            <button type="button" class=" tp-size-variation-btn" style="width: 80px !important;">
+                                            <button type="button" (click)="selectedSubVariation(subvariation)" class=" tp-size-variation-btn" style="width: 80px !important;">
                                             <span>{{ subvariation.value_add  }}</span>
                                             </button>
                                         }
@@ -157,13 +157,13 @@
                              <div class="tp-product-details-action-item-wrapper d-flex align-items-center">
                                 <div class="tp-product-details-quantity">
                                    <div class="tp-product-quantity mb-15 mr-15">
-                                      <span class="tp-cart-minus">
+                                      <span class="tp-cart-minus" id="tp-cart-minus-landing">
                                          <svg width="11" height="2" viewBox="0 0 11 2" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M1 1H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                          </svg>                                                            
                                       </span>
-                                      <input class="tp-cart-input" type="text" value="1">
-                                      <span class="tp-cart-plus">
+                                      <input class="tp-cart-input" id="tp-cart-input-val" type="text" value="1">
+                                      <span class="tp-cart-plus" id="tp-cart-plus-landing">
                                          <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M1 6H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                             <path d="M5.5 10.5V1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -172,7 +172,7 @@
                                    </div>
                                 </div>
                                 <div class="tp-product-details-add-to-cart mb-15 w-100">
-                                   <button class="tp-product-details-add-to-cart-btn w-100">Add To Cart</button>
+                                   <button class="tp-product-details-add-to-cart-btn w-100" (click)="addCart()">Add To Cart</button>
                                 </div>
                              </div>
                              <button class="tp-product-details-buy-now-btn w-100">Buy Now</button>
@@ -496,7 +496,7 @@
                             <div class="swiper-slide">
                                <div class="tp-product-item-3 tp-product-style-primary mb-50">
                                   <div class="tp-product-thumb-3 mb-15 fix p-relative z-index-1">
-                                     <a href="#" onclick="return false;">
+                                     <a [routerLink]="[ '/producto', PRODUCT.slug ]">
                                         <img [src]="PRODUCT.imagen" style="width: 282px;height: 320px;object-fit: contain;" alt="">
                                      </a>
           
@@ -554,13 +554,13 @@
                                         <span>{{ PRODUCT.brand.name }}</span>
                                      </div>
                                      <h3 class="tp-product-title-3">
-                                        <a href="#" onclick="return false;">{{PRODUCT.title}}</a>
+                                        <a [routerLink]="[ '/producto', PRODUCT.slug ]">{{PRODUCT.title}}</a>
                                      </h3>
                                      <div class="tp-product-price-wrapper-3">
                                         @if(PRODUCT.discount_g){
-                                            <span class="tp-product-price-3 old-price mx-1">{{currency}} {{ getTotalCurrency(PRODUCT) }}</span>
-                                         }
-                                         <span class="tp-product-price-3 new-price">{{currency}} {{ getTotalPriceProduct(PRODUCT) }}</span>
+                                           <span class="tp-product-price-3 old-price mx-1">{{currency}} {{ getTotalCurrency(PRODUCT) }}</span>
+                                       }
+                                       <span class="tp-product-price-3 new-price">{{currency}} {{ getTotalPriceProduct(PRODUCT) }}</span>
 
                                      </div>
                                   </div>

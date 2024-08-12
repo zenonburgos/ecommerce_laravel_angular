@@ -89,15 +89,12 @@ export class HomeComponent {
           }
         });
       }, 50);
-      this.currency = this.cookieService.get("currency") ? this.cookieService.get("currency") : 'USD';
+      // this.currency = this.cookieService.get("currency") ? this.cookieService.get("currency") : 'USD';
     })
   }
 
-  ngOnInit(){
-    this.cartService.changeCart({
-      id: 1,
-      name: 'Prueba realizada.',
-    });
+  ngOnInit(){    
+    this.currency = this.cookieService.get("currency") ? this.cookieService.get("currency") : 'USD';
   }
 
   addCart(PRODUCT:any){
@@ -113,19 +110,25 @@ export class HomeComponent {
       return;
     }
 
+    let discount_g = null;
+
+    if(PRODUCT.discount_g){
+      discount_g = PRODUCT.discount_g;
+    }
+
     let data = {
       product_id: PRODUCT.id,
-      type_discount: null,
-      discount: 0,
-      type_campaign: null,
+      type_discount: discount_g ? discount_g.type_discount : null,
+      discount: discount_g ? discount_g.discount : null,
+      type_campaign: discount_g ? discount_g.type_campaign : null,
       code_cupon: null,
-      code_discount: null,
+      code_discount: discount_g ? discount_g.code : null,
       product_variation_id: null,
       quantity: 1,
-      price_unit: PRODUCT.price,
-      subtotal: PRODUCT.price,
-      total: PRODUCT.price,
-      currency: 'USD',
+      price_unit: this.currency == 'USD' ? PRODUCT.price : PRODUCT.price,
+      subtotal: this.getTotalPriceProduct(PRODUCT),
+      total: this.getTotalPriceProduct(PRODUCT)*1,
+      currency: this.currency,
     }
 
     this.cartService.registerCart(data).subscribe((resp:any) => {
@@ -196,12 +199,17 @@ export class HomeComponent {
     }
   }
 
-  openDetailProduct(PRODUCT:any){
+  openDetailProduct(PRODUCT:any,DISCOUNT_FLASH:any = null){
     this.product_selected = null;
     this.variation_selected = null;
     setTimeout(() => {
+      setTimeout(() => {
+        if(DISCOUNT_FLASH){
+          this.product_selected.discount_g = DISCOUNT_FLASH;
+        }        
+      }, 25);
       this.product_selected = PRODUCT;
-      MODAL_PRODUCT_DETAIL($);
+      // MODAL_PRODUCT_DETAIL($);
     }, 50);
   }
   selectedVariation(variation:any){
