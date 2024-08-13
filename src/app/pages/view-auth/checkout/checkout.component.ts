@@ -3,7 +3,7 @@ import { CartService } from '../../home/service/cart.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserAddressService } from '../service/user-address.service';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -37,7 +37,7 @@ export class CheckoutComponent {
   email:string = '';
 
   address_selected:any;
-
+  description:string = '';
   @ViewChild('paypal',{static: true}) paypalElement?: ElementRef;
 
   constructor(
@@ -45,6 +45,7 @@ export class CheckoutComponent {
     public cookieService: CookieService,
     public addressService: UserAddressService,
     private toastr: ToastrService,
+    public router: Router,
   ){
 
     afterNextRender(() => {
@@ -75,7 +76,27 @@ export class CheckoutComponent {
       createOrder: (data:any, actions:any) => {
           // pass in any options from the v2 orders create call:
           // https://developer.paypal.com/api/orders/v2/#orders-create-request-body
-
+          if(this.totalCarts == 0){
+            this.toastr.error("Validación", "No puedes procesar el pago con un monto de 0.")
+            return;
+          }
+          if(this.listCarts.length == 0){
+            this.toastr.error("Validación", "No puedes procesar el pago sin ningún producto en el carrito.")
+            return;
+          }
+          if(!this.name || 
+            !this.surname || 
+            !this.company || 
+            !this.country_region || 
+            !this.city || 
+            !this.address || 
+            !this.street || 
+            !this.postcode_zip || 
+            !this.phone || 
+            !this.email ){
+            this.toastr.error("Validación", "Todos los campos de la dirección son necesarios.");
+            return;
+          }
           const createOrderPayload = {
             purchase_units: [
               {
@@ -96,6 +117,35 @@ export class CheckoutComponent {
           let Order = await actions.order.capture();
           // Order.purchase_units[0].payments.captures[0].id
 
+          let dataSale = {
+            payment_method: 'PAYPAL',
+            currency_total: this.currency,
+            currency_payment: 'USD',
+            discount: 0,
+            subtotal: this.totalCarts,
+            total: this.totalCarts,
+            dolar_price: 0,
+            n_transaction: Order.purchase_units[0].payments.captures[0].id,
+            description: this.description,
+            sale_address: {
+              name: this.name,
+              surname: this.surname,
+              company: this.company,
+              country_region: this.country_region,
+              city: this.city,
+              address: this.address,
+              street: this.street,
+              postcode_zip: this.postcode_zip,
+              phone: this.phone,
+              email: this.email,
+            }
+          }
+          this.cartService.checkout(dataSale).subscribe((resp:any) => {
+            console.log(resp);
+            this.toastr.success("Exitoso", "La compra se ha realizado.");
+            this.router.navigateByUrl("/gracias-por-tu-compra/"+Order.purchase_units[0].payments.captures[0].id);
+            // La redirección a la página de gracias
+          });
           //return actions.order.capture().then(captureOrderHandler);
       },
 
